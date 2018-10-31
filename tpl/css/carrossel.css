@@ -1,0 +1,10 @@
+.slide_desc{display: none;}
+.box_carrossel{width: 100%; position: relative; background: #fff; box-shadow: 0 0 5px 1px #000;}
+.box_carrossel .nav{position: absolute; top: 0; padding: 0 5px; display: table; height: 147px; background: cornflowerblue; color: #fff; font-size: 1.3em; cursor: pointer;}
+.box_carrossel .nav p{display: table-cell; vertical-align: middle;}
+.box_carrossel .nav:hover{background: #99ccff;}
+.box_carrossel .nav.back{left: 0;}
+.box_carrossel .nav.forth{right: 0;}
+
+.carrossel{width: 1000%;list-style: none; float: left; background: #fff;}
+.carrossel .item{float: left; width: 80%; padding: 10px; margin-right: 10px; background: #99ccff;}
