@@ -1,6 +1,6 @@
 <?php
 
-require '_app/Library/PHPMailer/class.phpmailer.php';
+require_once '_app/Library/PHPMailer/class.phpmailer.php';
 
 /**
  * Email [MODEL]
@@ -83,8 +83,9 @@ class FormNautico {
 
     //PRIVATES
     private function Clear() {
-        array_map('strip_tags', $this->Data);
-        array_map('trim', $this->Data);
+        $this->Data = array_map(function ($Value) {
+            return trim(strip_tags((string) $Value));
+        }, $this->Data);
     }
 
     private function setMail() {

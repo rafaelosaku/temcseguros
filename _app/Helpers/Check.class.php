@@ -2,8 +2,8 @@
 
 /**
  * Check.class [ HELPER ]
- * Classe responsável por manipular e validar dados do sistema.
- * 
+ * Classe responsavel por manipular e validar dados do sistema.
+ *
  * @copyright (c) 2015, Rafael Osaku
  */
 class Check {
@@ -23,16 +23,17 @@ class Check {
     }
 
     public static function Name($Name) {
-        self::$Format = array();
-        self::$Format['a'] = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜüÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿRr"!@#$%&*()_-+={[}]/?;:.,\\\'<>°ºª';
-        self::$Format['b'] = 'aaaaaaaceeeeiiiidnoooooouuuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr                                 ';
+        self::$Data = strip_tags(trim((string) $Name));
 
-        self::$Data = strtr(utf8_decode($Name), utf8_decode(self::$Format['a']), self::$Format['b']);
-        self::$Data = strip_tags(trim(self::$Data));
-        self::$Data = str_replace(' ', '-', self::$Data);
-        self::$Data = str_replace(array('-----', '----', '---', '--'), '-', self::$Data);
+        if (function_exists('iconv')):
+            $Converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', self::$Data);
+            self::$Data = ($Converted !== false ? $Converted : self::$Data);
+        endif;
 
-        return strtolower(utf8_encode(self::$Data));
+        self::$Data = preg_replace('/[^A-Za-z0-9]+/', '-', self::$Data);
+        self::$Data = trim(self::$Data, '-');
+
+        return strtolower(self::$Data);
     }
 
     public static function Data($Data) {
@@ -66,12 +67,12 @@ class Check {
         if ($read->getRowCount()):
             return $read->getResult()[0]['category_id'];
         else:
-            echo "A categoria {$CategoryName} não foi encontrada!";
+            echo "A categoria {$CategoryName} nao foi encontrada!";
             die;
         endif;
     }
 
-    //ws_siteviews_online
+    // ws_siteviews_online
     public static function UserOnLine() {
         $now = date('Y-m-d H:i:s');
         $deleteUserOnline = new Delete;
@@ -88,7 +89,7 @@ class Check {
         if (file_exists(self::$Data) && !is_dir(self::$Data)):
             $path = HOME;
             $imagem = self::$Data;
-            //return $path . $imagem;
+            // return $path . $imagem;
             return "<img src=\"{$path}/tim.php?src={$path}/{$imagem}&w={$ImageW}&h={$ImageH}\" alt=\"{$ImageDes}\" title=\"{$ImageDes}\"/>";
         endif;
     }

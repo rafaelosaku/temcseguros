@@ -965,7 +965,7 @@ class PHPMailer {
    * @return bool
    */
   protected function SmtpSend($header, $body) {
-    require_once $this->PluginDir . 'class.smtp.php';
+    require_once ($this->PluginDir ? $this->PluginDir : dirname(__FILE__) . DIRECTORY_SEPARATOR) . 'class.smtp.php';
     $bad_rcpt = array();
 
     if(!$this->SmtpConnect()) {
@@ -1853,10 +1853,12 @@ class PHPMailer {
       //      return false;
       //    }
       //  }
-      $magic_quotes = get_magic_quotes_runtime();
+      $magic_quotes = function_exists('get_magic_quotes_runtime') ? get_magic_quotes_runtime() : false;
       if ($magic_quotes) {
         if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-          set_magic_quotes_runtime(0);
+          if (function_exists('set_magic_quotes_runtime')) {
+            set_magic_quotes_runtime(0);
+          }
         } else {
           ini_set('magic_quotes_runtime', 0); 
         }
@@ -1865,7 +1867,9 @@ class PHPMailer {
       $file_buffer  = $this->EncodeString($file_buffer, $encoding);
       if ($magic_quotes) {
         if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-          set_magic_quotes_runtime($magic_quotes);
+          if (function_exists('set_magic_quotes_runtime')) {
+            set_magic_quotes_runtime($magic_quotes);
+          }
         } else {
           ini_set('magic_quotes_runtime', $magic_quotes); 
         }
@@ -2047,7 +2051,7 @@ class PHPMailer {
     $eol = "\r\n";
     $escape = '=';
     $output = '';
-    while( list(, $line) = each($lines) ) {
+    foreach ($lines as $line) {
       $linlen = strlen($line);
       $newline = '';
       for($i = 0; $i < $linlen; $i++) {
@@ -2078,7 +2082,7 @@ class PHPMailer {
         $newline .= $c;
       } // end of for
       $output .= $newline.$eol;
-    } // end of while
+    } // end of foreach
     return $output;
   }
 

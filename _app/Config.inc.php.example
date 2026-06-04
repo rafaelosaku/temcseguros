@@ -1,9 +1,14 @@
 <?php
 
-// CONFIGURAÇÕES E DEFINIÇÕES DO SITE ##############
+// CONFIGURACOES E DEFINICOES DO SITE ##############
 // Home
-define('HOME', 'http://localhost:8080');
-//Banco de dados
+$serverScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$serverHost = (!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
+$scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+$scriptDir = rtrim($scriptDir, '/');
+define('HOME', $serverScheme . '://' . $serverHost . ($scriptDir ? $scriptDir : ''));
+
+// Banco de dados
 define('HOST', '');
 define('USER', '');
 define('PASS', '');
@@ -11,29 +16,26 @@ define('DBSA', '');
 
 // DEFINE SERVIDOR DE E-MAIL #######################
 define('MAILUSER', 'example@mail.com');
-define('USERNAME', 'Nome de usuário');
+define('USERNAME', 'Nome de usuario');
 define('MAILPASS', 'password');
-define('MAILPORT', '587' );
+define('MAILPORT', '587');
 define('MAILHOST', 'host de e-mail');
 
-
 // AUTO LOAD DE CLASSES  ############################
-function __autoload($Class) {
-   $cDir = ['Conn', 'Helpers', 'Models', 'Library'];
-    $iDir = null;
+spl_autoload_register(function ($Class) {
+    $cDir = ['Conn', 'Helpers', 'Models', 'Library'];
 
     foreach ($cDir as $dirName):
-        if (!$iDir && file_exists(__DIR__ . "/{$dirName}/{$Class}.class.php") && !is_dir($dirName)):
-           include_once (__DIR__ . "/{$dirName}/{$Class}.class.php");
-            $iDir = true;
+        $classFile = __DIR__ . "/{$dirName}/{$Class}.class.php";
+
+        if (is_file($classFile)):
+            include_once $classFile;
+            return;
         endif;
     endforeach;
 
-    if (!$iDir):
-        trigger_error("Não foi possível incluir {$Class}.class.php", E_USER_ERROR);
-        die;
-    endif;
-}
+    trigger_error("Nao foi possivel incluir {$Class}.class.php", E_USER_ERROR);
+});
 
 // TIMEZONE DEFAULT
 date_default_timezone_set('America/Sao_Paulo');
@@ -46,7 +48,7 @@ define('WS_INFOR', 'infor');
 define('WS_ALERT', 'alert');
 define('WS_ERROR', 'error');
 
-//WSErro :: Exibe erros lançados :: Front
+// WSErro :: Exibe erros lancados :: Front
 function WSErro($ErrMsg, $ErrNo, $ErrDie = null) {
     $CssClass = ($ErrNo == E_USER_NOTICE ? WS_INFOR : ($ErrNo == E_USER_WARNING ? WS_ALERT : ($ErrNo == E_USER_ERROR ? WS_ERROR : $ErrNo)));
     echo "<p class=\"trigger {$CssClass}\">{$ErrMsg}<span class=\"ajax_close\"></span></p>";
@@ -56,7 +58,7 @@ function WSErro($ErrMsg, $ErrNo, $ErrDie = null) {
     endif;
 }
 
-//PHPErro :: personaliza o gatilho do PHP
+// PHPErro :: personaliza o gatilho do PHP
 function PHPErro($ErrNo, $ErrMsg, $ErrFile, $ErrLine) {
     $CssClass = ($ErrNo == E_USER_NOTICE ? WS_INFOR : ($ErrNo == E_USER_WARNING ? WS_ALERT : ($ErrNo == E_USER_ERROR ? WS_ERROR : $ErrNo)));
     echo "<p class=\"trigger {$CssClass}\">";
@@ -71,12 +73,13 @@ function PHPErro($ErrNo, $ErrMsg, $ErrFile, $ErrLine) {
 
 set_error_handler('PHPErro');
 
-//CONFIGURAÇÕES DE URL AMIGÁVEL ####################
-$getUrl = strip_tags(trim(filter_input(INPUT_GET, 'url', FILTER_DEFAULT)));
+// CONFIGURACOES DE URL AMIGAVEL ####################
+$getUrl = filter_input(INPUT_GET, 'url', FILTER_DEFAULT);
+$getUrl = (is_string($getUrl) ? strip_tags(trim($getUrl)) : '');
 $setUrl = (empty($getUrl) ? 'index' : $getUrl);
 $url = explode('/', $setUrl);
 
-/** variáveis do site */
+/** variaveis do site */
 $pg_site = 'TEMC Seguros';
 $pg_name = $pg_site;
 $pg_sitekit = HOME . '/tpl/img/sitekit/';
@@ -90,5 +93,3 @@ $pg_google_publisher = '114416679358029603173';
 $pg_fb_app = '1504030069919043';
 $pg_fb_author = 'rafael.osaku';
 $pg_fb_page = 'TEMC-Seguros-1543751359271549';
-
-

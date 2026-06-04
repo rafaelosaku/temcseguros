@@ -1,12 +1,21 @@
 <?php
 
-$nome = $_POST['nome'];
-$email = $_POST['e-mail'];
-$cidade = $_POST['cidade'];
-$mensagem = $_POST['mensagem'];
+if (!defined('HOME')):
+    require_once __DIR__ . '/../_app/Config.inc.php';
+endif;
+
+$nome = filter_input(INPUT_POST, 'nome', FILTER_DEFAULT);
+$email = filter_input(INPUT_POST, 'e-mail', FILTER_DEFAULT);
+$cidade = filter_input(INPUT_POST, 'cidade', FILTER_DEFAULT);
+$mensagem = filter_input(INPUT_POST, 'mensagem', FILTER_DEFAULT);
+
+$nome = trim(strip_tags((string) $nome));
+$email = trim(strip_tags((string) $email));
+$cidade = trim(strip_tags((string) $cidade));
+$mensagem = trim(strip_tags((string) $mensagem));
 
 $destinatario = "rflosaku@hotmail.com";
-$assunto = 'Formlulário de contato';
+$assunto = 'Formulario de contato';
 $arquivo = "
     <style type='text/css'>
         td{background: #ccc;}
@@ -32,18 +41,13 @@ $arquivo = "
                 </tr>
             </table>
         </html>
-                
+
         ";
 
 $msg = 'MIME-Version: 1.0' . "\r\n";
 $msg .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-$msg .= 'From: <$nome> <$email>';
+$msg .= "From: {$nome} <{$email}>";
 
-
-if (mail("$destinatario", "$assunto", "$arquivo", "$msg")) {
-    echo 'Formulário enviado com sucesso!';
-    header('Location: ' . HOME . '/contato');
-} else {
-    echo 'Erros ao enviar formulário"';
-    header('Location: ' . HOME . '/contato');
-}
+mail($destinatario, $assunto, $arquivo, $msg);
+header('Location: ' . HOME . '/form/contato');
+exit;
